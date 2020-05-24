@@ -3,11 +3,14 @@
 
 #include <iostream>
 
-class StringValue{
+namespace String {
+    
+class StringValue {
 private:
     char* data_;
     int size_;
     int refcount_;
+
 public:
     StringValue(const char* = "");
     StringValue(const StringValue&);
@@ -24,29 +27,31 @@ public:
 
 };
 
-class MyString
-{   private:
-        StringValue *p;
-    public:
-        MyString(const char* = "");
-        MyString(const MyString&);
-        MyString(MyString &&) noexcept;
-        ~MyString();
-        MyString& operator=(const MyString&);
-        MyString& operator=(MyString&&) noexcept;
-        MyString operator+(char) const;
-        MyString& operator+=(char);
-        MyString operator+(const MyString&) const;
-        MyString& operator+=(const MyString&);
-        int length() const;
-        char& operator[](int);
-        const char& operator[](int) const;
-        const char* toString() const;
-        int getValueRefCount();
+class MyString {
+private:
+    StringValue *p;
 
+public:
+    MyString(const char* = "");
+    MyString(const MyString&);
+    MyString(MyString &&) noexcept;
+    ~MyString();
+    MyString& operator=(const MyString&);
+    MyString& operator=(MyString&&) noexcept;
+    MyString operator+(char) const;
+    MyString& operator+=(char);
+    MyString operator+(const MyString&) const;
+    MyString& operator+=(const MyString&);
+    int length() const;
+    char& operator[](int);
+    const char& operator[](int) const;
+    const char* toString() const;
+    int getValueRefCount();
 };
 
 std::ostream& operator<<(std::ostream&, const MyString&);
 std::istream& operator>>(std::istream&, MyString&);
 
 #endif // MYSTRING_H
+
+} // ns String

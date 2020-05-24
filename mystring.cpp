@@ -1,7 +1,9 @@
 #include "mystring.h"
 #include <cstring>
 
-StringValue::StringValue(const char* s){
+namespace String {
+
+StringValue::StringValue(const char* s) {
     size_ = strlen(s);
     //data_ = nullptr;
     data_ = new char[size_ + 1];
@@ -9,7 +11,7 @@ StringValue::StringValue(const char* s){
     refcount_ = 1;
 }
 
-StringValue::StringValue(const StringValue& rhs){
+StringValue::StringValue(const StringValue& rhs) {
     size_ = rhs.size_ + 1;
     data_ = new char[size_ + 1];
     strcpy(data_, rhs.data_);
@@ -17,15 +19,15 @@ StringValue::StringValue(const StringValue& rhs){
     refcount_ = 1;
 
 }
-char& StringValue::operator[](int pos){
+char& StringValue::operator[](int pos) {
     return data_[pos];
 }
 
-const char& StringValue::operator[](int pos) const{
+const char& StringValue::operator[](int pos) const {
     return data_[pos];
 }
 
-StringValue StringValue::operator+(char c) const{
+StringValue StringValue::operator+(char c) const {
     StringValue newValue;
     delete[] newValue.data_;
     newValue.size_ = size_ + 1;
@@ -38,7 +40,7 @@ StringValue StringValue::operator+(char c) const{
 
 }
 
-StringValue StringValue::operator+(const StringValue& rhs) const{
+StringValue StringValue::operator+(const StringValue& rhs) const {
     StringValue newValue;
     delete[] newValue.data_;
     newValue.size_ = this->size_ + rhs.size_;
@@ -48,58 +50,58 @@ StringValue StringValue::operator+(const StringValue& rhs) const{
     return newValue;
 }
 
-StringValue::~StringValue(){
+StringValue::~StringValue() {
     delete[] data_;
 }
 
-int StringValue::getRefCount() const{
+int StringValue::getRefCount() const {
     return refcount_;
 }
 
-void StringValue::incRefCount(){
+void StringValue::incRefCount() {
     refcount_++;
 }
 
-void StringValue::decRefCount(){
+void StringValue::decRefCount() {
     refcount_--;
 }
 
-const char* StringValue::getData()const{
+const char* StringValue::getData() const {
     return data_;
 }
 
-int StringValue::getLength(){
+int StringValue::getLength() {
     return size_;
 }
 
-MyString::MyString(const char* s){
+MyString::MyString(const char* s) {
     p = new StringValue(s);
 }
 
 MyString::MyString(const MyString& rhs): p{rhs.p}{
-    if(p){
+    if (p) {
         p->incRefCount();
     }
 }
 
-MyString::MyString(MyString && rhs) noexcept{
+MyString::MyString(MyString&& rhs) noexcept{
     p = rhs.p;
     rhs.p = nullptr;
 }
 
-MyString::~MyString(){
-    if(p){
+MyString::~MyString() {
+    if (p) {
         p->decRefCount();
-        if(p->getRefCount() == 0)
+        if (p->getRefCount() == 0)
             delete p;
     }
 }
 
-MyString& MyString::operator=(const MyString& rhs){
-    if(this != &rhs) {
-        if(p)
+MyString& MyString::operator=(const MyString& rhs) {
+    if (this != &rhs) {
+        if (p)
             p->decRefCount();
-        if(p->getRefCount() == 0)
+        if (p->getRefCount() == 0)
             delete p;
         p = rhs.p;
         p->incRefCount();
@@ -108,10 +110,10 @@ MyString& MyString::operator=(const MyString& rhs){
 }
 
 MyString& MyString::operator=(MyString&& rhs) noexcept{
-    if(this != &rhs) {
-        if(p)
+    if (this != &rhs) {
+        if (p)
             p->decRefCount();
-        if(p->getRefCount() == 0)
+        if (p->getRefCount() == 0)
             delete p;
         p = rhs.p;
         rhs.p = nullptr;
@@ -120,76 +122,76 @@ MyString& MyString::operator=(MyString&& rhs) noexcept{
 
 }
 
-MyString MyString::operator+(char c) const{
-    //StringValue *newValue = new StringValue(*p + c);
-    //MyString temp(newValue->getData());
-    //delete newValue;
+MyString MyString::operator+(char c) const {
     MyString temp(*p->getData() + &c);
     return temp;
 }
 
-MyString& MyString::operator+=(char c){
+MyString& MyString::operator+=(char c) {
     StringValue *newValue = new StringValue(*p + c);
-    if(p)
+    if (p)
         p->decRefCount();
-    if(p->getRefCount() == 0)
+    if (p->getRefCount() == 0)
         delete p;
     p = newValue;
     return *this;
 }
 
-MyString MyString::operator+(const MyString& rhs) const{
+MyString MyString::operator+(const MyString& rhs) const {
     StringValue *newValue = new StringValue(*p + *rhs.p);
     MyString temp(newValue->getData());
     delete newValue;
     return temp;
 }
 
-MyString& MyString::operator+=(const MyString& rhs){
+MyString& MyString::operator+=(const MyString& rhs) {
     StringValue *newValue = new StringValue(*p + *rhs.p);
-    if(p)
+    if (p)
         p->decRefCount();
-    if(p->getRefCount() == 0)
+    if (p->getRefCount() == 0)
         delete p;
     p = newValue;
     return *this;
 }
 
-int MyString::length() const{
+int MyString::length() const {
     return p->getLength();
 }
 
-char& MyString::operator[](int pos){
+char& MyString::operator[](int pos) {
     StringValue *newValue = new StringValue(*p);
-    if(p)
+    if (p)
        p->decRefCount();
-    if(p->getRefCount() == 0)
+    if (p->getRefCount() == 0)
         delete p;
     p = newValue;
     return p->operator[](pos);
 }
 
-const char& MyString::operator[](int pos) const{
+const char& MyString::operator[](int pos) const {
     return p->operator[](pos);
 }
 
-const char* MyString::toString() const{
+const char* MyString::toString() const {
     return p->getData();
 }
 
-int MyString::getValueRefCount(){
+int MyString::getValueRefCount() {
     return p->getRefCount();
 }
 
-std::ostream& operator<<(std::ostream& os, const MyString& s){
+std::ostream& operator<<(std::ostream& os, const MyString& s) {
     return os << s.toString();
 }
 
-std::istream& operator>>(std::istream& is, MyString& s){
+std::istream& operator>>(std::istream& is, MyString& s) {
     char c;
     MyString temp;
-    while(is.get(c) && c != '\n')
+    while (is.get(c)&& c != '\n') {
         temp += c;
+    }
     s = temp;
     return is;
 }
+
+} // ns String
